@@ -1,0 +1,8 @@
+name: "CodeQL config"
+paths:
+  - tintel-platform/tintel-front/src
+  - tintel-platform/tintel-graphql/src
+  - tintel-worker/src
+paths-ignore:
+  - tintel-platform/opencti-front/src/static
+  - tintel-platform/opencti-graphql/src/generated

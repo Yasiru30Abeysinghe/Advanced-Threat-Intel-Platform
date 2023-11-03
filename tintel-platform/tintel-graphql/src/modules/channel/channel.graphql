@@ -1,0 +1,211 @@
+type Channel implements BasicObject & StixObject & StixCoreObject & StixDomainObject {
+    id: ID! # internal_id
+    standard_id: String!
+    entity_type: String!
+    parent_types: [String]!
+    # StixObject
+    representative: Representative!
+    x_opencti_stix_ids: [StixId]
+    is_inferred: Boolean!
+    spec_version: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    # inferences
+    x_opencti_inferences: [Inference]
+    # StixCoreObject
+    createdBy: Identity
+    numberOfConnectedElement: Int!
+    objectMarking: MarkingDefinitionConnection
+    objectOrganization: OrganizationConnection @auth(for: [KNOWLEDGE_KNUPDATE_KNORGARESTRICT])
+    objectLabel: LabelConnection
+    externalReferences(first: Int): ExternalReferenceConnection
+    containersNumber: Number
+    containers(first: Int, entityTypes: [String!], elementId: [String]): ContainerConnection
+    reports(first: Int): ReportConnection
+    notes(first: Int): NoteConnection
+    opinions(first: Int): OpinionConnection
+    observedData(first: Int): ObservedDataConnection
+    groupings(first: Int): GroupingConnection
+    cases(first: Int): CaseConnection
+    stixCoreRelationships(
+        first: Int
+        after: ID
+        orderBy: StixCoreRelationshipsOrdering
+        orderMode: OrderingMode
+        fromId: StixRef
+        toId: StixRef
+        fromTypes: [String]
+        toTypes: [String]
+        relationship_type: String
+        startTimeStart: DateTime
+        startTimeStop: DateTime
+        stopTimeStart: DateTime
+        stopTimeStop: DateTime
+        firstSeenStart: DateTime
+        firstSeenStop: DateTime
+        lastSeenStart: DateTime
+        lastSeenStop: DateTime
+        confidences: [Int]
+        search: String
+        filters: [StixCoreRelationshipsFiltering]
+        filterMode: FilterMode
+    ): StixCoreRelationshipConnection
+    stixCoreObjectsDistribution(
+        relationship_type: [String]
+        toTypes: [String]
+        field: String!
+        startDate: DateTime
+        endDate: DateTime
+        dateAttribute: String
+        operation: StatsOperation!
+        limit: Int
+        order: String
+        types: [String]
+        filters: [StixCoreObjectsFiltering]
+        filterMode: FilterMode
+        search: String
+    ): [Distribution] @auth(for: [KNOWLEDGE, EXPLORE])
+    stixCoreRelationshipsDistribution(
+        field: String!
+        operation: StatsOperation!
+        startDate: DateTime
+        endDate: DateTime
+        dateAttribute: String
+        isTo: Boolean
+        limit: Int
+        order: String
+        elementWithTargetTypes: [String]
+        fromId: [String]
+        fromRole: String
+        fromTypes: [String]
+        toId: [String]
+        toRole: String
+        toTypes: [String]
+        relationship_type: [String]
+        confidences: [Int]
+        search: String
+        filters: [StixCoreRelationshipsFiltering]
+        filterMode: FilterMode
+    ): [Distribution] @auth(for: [KNOWLEDGE, EXPLORE])
+    # StixDomainObject
+    revoked: Boolean!
+    confidence: Int
+    lang: String
+    created: DateTime
+    modified: DateTime
+    x_opencti_graph_data: String
+    objectAssignee: AssigneeConnection
+    avatar: OpenCtiFile
+    # Channel
+    name: String!
+    description: String
+    channel_types: [String]
+    aliases: [String]
+    # Technical
+    creators: [Creator!]
+    toStix: String
+    importFiles(first: Int, prefixMimeType: String): FileConnection
+    pendingFiles(first: Int): FileConnection
+    exportFiles(first: Int): FileConnection
+    editContext: [EditUserContext!]
+    connectors(onlyAlive: Boolean): [Connector]
+    jobs(first: Int): [Work]
+    status: Status
+    workflowEnabled: Boolean
+}
+
+# Ordering
+enum ChannelsOrdering {
+    name
+    channel_types
+    created
+    modified
+    created_at
+    updated_at
+    objectMarking
+    objectLabel
+    x_opencti_workflow_id
+    confidence
+}
+
+# Filtering
+enum ChannelsFilter {
+    name
+    aliases
+    channel_types
+    created
+    modified
+    created_at
+    updated_at
+    createdBy
+    markedBy
+    assigneeTo
+    labelledBy
+    x_opencti_workflow_id
+    confidence
+    source_reliability
+}
+input ChannelsFiltering {
+    key: [ChannelsFilter!]!
+    values: [String]
+    operator: String
+    filterMode: FilterMode
+}
+
+# Relay connections
+type ChannelConnection {
+    pageInfo: PageInfo!
+    edges: [ChannelEdge]
+}
+type ChannelEdge {
+    cursor: String!
+    node: Channel!
+}
+
+# Queries
+type Query {
+    channel(id: String!): Channel @auth(for: [KNOWLEDGE])
+    channels(
+        first: Int
+        after: ID
+        orderBy: ChannelsOrdering
+        orderMode: OrderingMode
+        filters: [ChannelsFiltering!]
+        filterMode: FilterMode
+        search: String
+    ): ChannelConnection @auth(for: [KNOWLEDGE])
+}
+
+# Mutations
+input ChannelAddInput {
+    stix_id: StixId
+    x_opencti_stix_ids: [StixId]
+    name: String! @constraint(minLength: 2)
+    description: String
+    channel_types: [String]
+    aliases: [String]
+    confidence: Int
+    revoked: Boolean
+    lang: String
+    createdBy: String
+    objectMarking: [String]
+    objectOrganization: [String]
+    objectLabel: [String]
+    externalReferences: [String]
+    created: DateTime
+    modified: DateTime
+    x_opencti_workflow_id: String
+    clientMutationId: String
+    update: Boolean
+    file: Upload
+}
+
+type Mutation {
+    channelAdd(input: ChannelAddInput!): Channel @auth(for: [KNOWLEDGE_KNUPDATE])
+    channelDelete(id: ID!): ID @auth(for: [KNOWLEDGE_KNUPDATE_KNDELETE])
+    channelFieldPatch(id: ID!, input: [EditInput]!, commitMessage: String, references: [String]): Channel @auth(for: [KNOWLEDGE_KNUPDATE])
+    channelContextPatch(id: ID!, input: EditContext!): Channel @auth(for: [KNOWLEDGE_KNUPDATE])
+    channelContextClean(id: ID!): Channel @auth(for: [KNOWLEDGE_KNUPDATE])
+    channelRelationAdd(id: ID!, input: StixRefRelationshipAddInput!): StixRefRelationship @auth(for: [KNOWLEDGE_KNUPDATE])
+    channelRelationDelete(id: ID!, toId: StixRef!, relationship_type: String!): Channel @auth(for: [KNOWLEDGE_KNUPDATE])
+}

@@ -1,0 +1,20 @@
+{
+  "include": ["./*", "./src/**/*", "./tests/**/*", "./script/**/*"],
+  "files": ["src/generated/graphql.ts"],
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "lib": ["es2021"],
+    "strict": true,
+    "allowJs": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+    "typeRoots": ["node_modules/@types", "src/types"]
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "app": {
+    "port": 4000,
+    "base_path": "",
+    "base_url": "http://localhost:4000/",
+    "enabled": true,
+    "https_cert": {
+      "ca": [],
+      "key": null,
+      "crt": null,
+      "reject_unauthorized": true,
+      "cookie_secure": false
+    },
+    "app_logs": {
+      "logs_level": "info",
+      "logs_files": true,
+      "logs_console": true,
+      "logs_max_files": 7,
+      "logs_directory": "./logs",
+      "logs_redacted_inputs": ["password", "secret", "token"]
+    },
+    "audit_logs": {
+      "logs_files": true,
+      "logs_console": true,
+      "logs_max_files": 7,
+      "logs_directory": "./logs"
+    },
+    "graphql": {
+      "armor_enabled": false,
+      "playground": {
+        "enabled": true,
+        "force_disabled_introspection": false
+      }
+    },
+    "telemetry": {
+      "tracing": {
+        "enabled": false,
+        "exporter_otlp": "",
+        "exporter_zipkin": ""
+      },
+      "metrics": {
+        "enabled": false,
+        "exporter_otlp": "",
+        "exporter_prometheus": 14269
+      }
+    },
+    "request_timeout": 1200000,
+    "session_timeout": 1200000,
+    "session_cookie": false,
+    "locked_account_statuses": {
+      "Inactive": "Your account has been marked inactive. If you would like to reactivate your account, please contact your administrator.",
+      "Locked": "Your account has been locked for security reasons. Please contact your administrator."
+    },
+    "account_statuses_default": "Active",
+    "session_idle_timeout": 0,
+    "session_manager": "shared",
+    "rate_protection": {
+      "time_window": 1,
+      "max_requests": 10000
+    },
+    "concurrency": {
+      "retry_count": 100,
+      "retry_delay": 250,
+      "retry_jitter": 100,
+      "max_ttl": 60000,
+      "extension_threshold": 5000
+    },
+    "live_stream": {
+      "cache_max_size": 5000,
+      "cache_max_time": 2
+    },
+    "performance_logger": false,
+    "map_tile_server_dark": "https://map.opencti.io/styles/filigran-dark/{z}/{x}/{y}.png",
+    "map_tile_server_light": "https://map.opencti.io/styles/filigran-light/{z}/{x}/{y}.png",
+    "reference_attachment": false,
+    "python_execution": "native",
+    "admin": {
+      "email": "admin@opencti.io",
+      "password": "ChangeMe",
+      "token": "ChangeMe"
+    }
+  },
+  "demo_mode": false,
+  "http_proxy": "",
+  "https_proxy": "",
+  "no_proxy": "",
+  "https_proxy_ca": [],
+  "https_proxy_reject_unauthorized": false,
+  "data_sharing": {
+    "max_csv_feed_result": 5000
+  },
+  "rule_engine": {
+    "enabled": true,
+    "lock_key": "rule_engine_lock"
+  },
+  "history_manager": {
+    "enabled": true,
+    "lock_key": "history_manager_lock"
+  },
+  "activity_manager": {
+    "enabled": true,
+    "lock_key": "activity_manager_lock"
+  },
+  "connector_manager": {
+    "enabled": true,
+    "lock_key": "connector_manager_lock",
+    "works_day_range": 7,
+    "interval": 60000
+  },
+  "import_csv_built_in_connector": {
+    "enabled": true,
+    "interval": 10000,
+    "validate_before_import": false
+  },
+  "task_scheduler": {
+    "enabled": true,
+    "lock_key": "task_manager_lock",
+    "interval": 10000
+  },
+  "expiration_scheduler": {
+    "enabled": true,
+    "lock_key": "expired_manager_lock",
+    "interval": 300000
+  },
+  "notification_manager": {
+    "enabled": true,
+    "lock_live_key": "notification_live_manager_lock",
+    "lock_digest_key": "notification_digest_manager_lock",
+    "interval": 10000
+  },
+  "playbook_manager": {
+    "enabled": true,
+    "lock_key": "playbook_manager_lock",
+    "interval": 60000
+  },
+  "publisher_manager": {
+    "enabled": true,
+    "lock_key": "publisher_manager_lock",
+    "interval": 10000
+  },
+  "sync_manager": {
+    "enabled": true,
+    "lock_key": "sync_manager_lock",
+    "interval": 10000
+  },
+  "ingestion_manager": {
+    "enabled": true,
+    "lock_key": "ingestion_manager_lock",
+    "interval": 300000
+  },
+  "retention_manager": {
+    "enabled": true,
+    "lock_key": "retention_manager_lock",
+    "interval": 60000
+  },
+  "redis": {
+    "mode": "single",
+    "namespace": "",
+    "hostname": "localhost",
+    "use_ssl": false,
+    "ca": [],
+    "port": 6379,
+    "trimming": 2000000
+  },
+  "elasticsearch": {
+    "index_prefix": "opencti",
+    "url": "http://localhost:9200",
+    "index_creation_pattern": "-000001",
+    "search_ignore_throttled": false,
+    "max_pagination_result": 5000,
+    "max_concurrency": 4,
+    "engine_selector": "auto"
+  },
+  "minio": {
+    "bucket_name": "opencti-bucket",
+    "bucket_region": "us-east-1",
+    "endpoint": "localhost",
+    "port": 9000,
+    "use_ssl": false,
+    "access_key": "ChangeMe",
+    "secret_key": "ChangeMe",
+    "excluded_files": [".DS_Store"],
+    "use_aws_role": false
+  },
+  "rabbitmq": {
+    "queue_prefix": "",
+    "hostname": "localhost",
+    "vhost": "/",
+    "use_ssl": false,
+    "use_ssl_ca": [],
+    "port": 5672,
+    "port_management": 15672,
+    "management_ssl": false,
+    "username": "guest",
+    "password": "guest",
+    "queue_type": "classic"
+  },
+  "smtp": {
+    "hostname": "localhost",
+    "use_ssl": false,
+    "reject_unauthorized": false,
+    "port": 25,
+    "username": "",
+    "password": ""
+  },
+  "providers": {
+    "local": {
+      "strategy": "LocalStrategy"
+    }
+  }
+}

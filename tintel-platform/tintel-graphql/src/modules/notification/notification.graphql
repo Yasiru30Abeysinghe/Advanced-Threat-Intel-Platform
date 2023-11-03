@@ -1,0 +1,263 @@
+# Outcomes
+
+type ResolvedInstanceFilter {
+    id: String!
+    valid: Boolean!
+    value: String
+}
+
+# Knowledge Triggers
+enum DigestPeriod {
+    hour
+    day
+    week
+    month
+}
+enum TriggersOrdering {
+    name
+    created
+    event_types
+    trigger_type
+    notifiers
+}
+enum TriggerType {
+    live
+    digest
+}
+enum TriggerEventType {
+    create
+    update
+    delete
+}
+enum TriggerFilter {
+    trigger_type
+    created
+    event_types
+    user_ids
+    group_ids
+    organization_ids
+    filters
+    instance_trigger
+}
+
+input TriggersFiltering {
+    key: [TriggerFilter!]!
+    values: [String]
+    operator: String
+    filterMode: FilterMode
+}
+input TriggerLiveAddInput {
+    name: String! @constraint(minLength: 1)
+    description: String
+    event_types: [TriggerEventType!]!
+    notifiers: [StixRef!]
+    instance_trigger: Boolean!
+    filters: String
+    recipients: [String!]
+}
+input TriggerDigestAddInput {
+    name: String! @constraint(minLength: 1)
+    description: String
+    trigger_ids: [String!]! # Triggers that composed the digest
+    period: DigestPeriod!
+    trigger_time: String
+    notifiers: [StixRef!]!
+    recipients: [String!]
+}
+
+type Trigger implements InternalObject & BasicObject {
+    id: ID! # internal_id
+    standard_id: String!
+    entity_type: String!
+    parent_types: [String]!
+    created: DateTime
+    modified: DateTime
+    name: String!
+    description: String
+    trigger_type: TriggerType! # live or digest
+    event_types: [String!]
+    filters: String
+    notifiers: [Notifier!]
+    trigger_ids: [String]
+    triggers: [Trigger]
+    recipients: [Member]
+    period: DigestPeriod
+    trigger_time: String
+    isDirectAdministrator: Boolean
+    currentUserAccessRight: String
+    instance_trigger: Boolean
+    resolved_instance_filters: [ResolvedInstanceFilter!]
+}
+type TriggerConnection {
+    pageInfo: PageInfo!
+    edges: [TriggerEdge!]!
+}
+type TriggerEdge {
+    cursor: String!
+    node: Trigger!
+}
+
+# Activity Triggers
+enum TriggerActivityFilter {
+    trigger_type
+    created
+    filters
+}
+enum TriggerActivityEventType {
+    authentication
+    read
+    mutation
+    file
+    command
+}
+input TriggerActivityLiveAddInput {
+    name: String! @constraint(minLength: 1)
+    description: String
+    notifiers: [StixRef!]
+    filters: String
+    recipients: [String!]!
+}
+
+input TriggerActivityDigestAddInput {
+    name: String! @constraint(minLength: 1)
+    description: String
+    trigger_ids: [String!]! # Triggers that composed the digest
+    period: DigestPeriod!
+    trigger_time: String
+    notifiers: [StixRef!]!
+    recipients: [String!]!
+}
+
+input TriggerActivityFiltering {
+    key: [TriggerActivityFilter!]!
+    values: [String]
+    operator: String
+    filterMode: FilterMode
+}
+
+# Notifications
+enum NotificationsOrdering {
+    name
+    created
+}
+enum NotificationFilter {
+    created
+    is_read
+}
+input NotificationsFiltering {
+    key: [NotificationFilter!]!
+    values: [String]
+    operator: String
+    filterMode: FilterMode
+}
+type NotificationCount {
+    user_id: String
+    count: Int
+}
+type NotificationEvent {
+    message: String!
+    instance_id: String
+    operation: String!
+}
+type NotificationContent {
+    title: String!
+    events: [NotificationEvent!]!
+}
+type Notification implements InternalObject & BasicObject {
+    id: ID! # internal_id
+    standard_id: String!
+    entity_type: String!
+    created: DateTime
+    name: String!
+    notification_type: String!
+    parent_types: [String]!
+    content: [NotificationContent!]!
+    is_read: Boolean!
+    user_id: String
+    created_at: DateTime
+    updated_at: DateTime
+}
+type NotificationConnection {
+    pageInfo: PageInfo!
+    edges: [NotificationEdge]
+}
+type NotificationEdge {
+    cursor: String!
+    node: Notification!
+}
+
+# Queries
+type Query {
+    # Outcomes
+    # Triggers
+    triggerKnowledge(id: String!): Trigger @auth
+    triggersKnowledge(
+        first: Int
+        after: ID
+        orderBy: TriggersOrdering
+        orderMode: OrderingMode
+        filters: [TriggersFiltering!]
+        filterMode: FilterMode
+        includeAuthorities: Boolean
+        search: String
+    ): TriggerConnection @auth
+    # Alerts
+    triggerActivity(id: String!): Trigger @auth(for: [SETTINGS])
+    triggersActivity(
+        first: Int
+        after: ID
+        orderBy: TriggersOrdering
+        orderMode: OrderingMode
+        filters: [TriggerActivityFiltering!]
+        filterMode: FilterMode
+        search: String
+    ): TriggerConnection @auth(for: [SETTINGS])
+    # Notifications
+    notification(id: String!): Notification @auth
+    notifications(
+        first: Int
+        after: ID
+        orderBy: NotificationsOrdering
+        orderMode: OrderingMode
+        filters: [NotificationsFiltering!]
+        filterMode: FilterMode
+        search: String
+    ): NotificationConnection @auth(for: [SETTINGS_SETACCESSES])
+    myNotifications(
+        first: Int
+        after: ID
+        orderBy: NotificationsOrdering
+        orderMode: OrderingMode
+        filters: [NotificationsFiltering!]
+        filterMode: FilterMode
+        search: String
+    ): NotificationConnection @auth
+    myUnreadNotificationsCount: Int @auth
+}
+
+# Mutations
+type Mutation {
+    # Outcomes
+    # Triggers
+    triggerKnowledgeDelete(id: ID!): ID @auth
+    triggerKnowledgeFieldPatch(id: ID!, input: [EditInput!]!): Trigger @auth
+    triggerKnowledgeLiveAdd(input: TriggerLiveAddInput!): Trigger @auth
+    triggerKnowledgeDigestAdd(input: TriggerDigestAddInput!): Trigger @auth
+    # Alerts
+    triggerActivityDelete(id: ID!): ID @auth(for: [SETTINGS])
+    triggerActivityFieldPatch(id: ID!, input: [EditInput!]!): Trigger @auth(for: [SETTINGS])
+    triggerActivityLiveAdd(input: TriggerActivityLiveAddInput!): Trigger @auth(for: [SETTINGS])
+    triggerActivityDigestAdd(input: TriggerActivityDigestAddInput!): Trigger @auth(for: [SETTINGS])
+    # Notifications
+    notificationDelete(id: ID!): ID @auth
+    notificationMarkRead(id: ID!, read: Boolean!): Notification @auth
+}
+
+# Subscriptions
+type Subscription {
+    # Outcomes
+    # Triggers
+    # Notifications
+    notification: Notification @auth
+    notificationsNumber: NotificationCount @auth
+}

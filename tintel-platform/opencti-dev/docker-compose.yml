@@ -1,0 +1,84 @@
+version: '3'
+services:
+  opencti-dev-redis:
+    container_name: opencti-dev-redis
+    image: redis:7.2.2
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+  opencti-dev-redis-insight:
+    container_name: opencti-dev-redis-insight
+    image: redislabs/redisinsight:latest
+    restart: unless-stopped
+    ports:
+      - 8001:8001
+  opencti-dev-elasticsearch:
+    container_name: opencti-dev-elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+      - essnapshots:/usr/share/elasticsearch/snapshots
+    environment:
+      - discovery.type=single-node
+      - xpack.ml.enabled=false
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms2G -Xmx2G"
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - 9200:9200
+      - 9300:9300
+  opencti-dev-kibana:
+    container_name: opencti-dev-kibana
+    image: docker.elastic.co/kibana/kibana:8.10.4
+    environment:
+      - ELASTICSEARCH_HOSTS=http://opencti-dev-elasticsearch:9200
+    restart: unless-stopped
+    ports:
+      - 5601:5601
+    depends_on:
+      - opencti-dev-elasticsearch
+  opencti-dev-minio:
+    container_name: opencti-dev-minio
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+      - "35300:35300"
+    environment:
+      MINIO_ROOT_USER: ChangeMe
+      MINIO_ROOT_PASSWORD: ChangeMe
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+  opencti-dev-rabbitmq:
+    container_name: opencti-dev-rabbitmq
+    image: rabbitmq:3.12-management
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+  opencti-dev-jaegertracing:
+    container_name: opencti-dev-jaegertracing
+    image: jaegertracing/all-in-one:latest
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    ports:
+      - 16686:16686
+      - 4318:4318
+
+volumes:
+  esdata:
+    driver: local
+  essnapshots:
+    driver: local
